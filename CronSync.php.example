@@ -1,0 +1,30 @@
+<?php
+/**
+ * This file configures synchronization via cron instead of the default lazy approach.
+ * Using cron-based synchronization is recommended for websites with high traffic.
+ *
+ * When using this mode, pass `'sync_by_cron' => true` when instantiating
+ * the CleanTalkAntiCrawler class. This disables the built-in lazy synchronization logic.
+ *
+ * Copy this file into your project and adjust it to your needs.
+ * Then configure your system cron to execute this file periodically
+ * (for example, every 5 minutes).
+ */
+
+// Cron line example: */5 * * * * yourusername php /path/to/file/CronSync.php
+// Make sure you run cronjob as the same user that owns the database!
+
+/** Edit this path depending on where in your project you're going to put the file */
+require_once __DIR__ . "/vendor/autoload.php";
+
+use Cleantalk\PHPAntiCrawler\Settings;
+use Cleantalk\PHPAntiCrawler\SQLiteManager;
+use Cleantalk\PHPAntiCrawler\SyncManager;
+
+Settings::configure([
+    'api_key' => 'put_your_key_here',
+    'db_path' => '/tmp/anticrawler.sqlite',
+    'visitor_forget_after' => 60 * 60 * 24 * 30,
+]);
+$pdo = SQLiteManager::initDb(Settings::$dbPath);
+(new SyncManager($pdo))->syncByCron(Settings::$apiKey);
