@@ -9,7 +9,10 @@ Simple anti-crawler library for PHP websites, with optional checks against Clean
 **Quick start**
 1) Copy `cleantalk-anticrawler.js` to your public files directory.
 
-2) Add this to your webpage: `<script src="/path/to/your/public/files/cleantalk-anticrawler.js">`
+2) Add this to your webpage:
+```
+<script src="/path/to/your/public/files/cleantalk-anticrawler.js">
+```
 
 3) Add this to your PHP page logic:
 ```
