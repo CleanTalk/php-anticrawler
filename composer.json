@@ -2,6 +2,7 @@
     "name": "cleantalk/php-anticrawler",
     "description": "Simple Anti-Crawler library for PHP websites by CleanTalk",
     "type": "library",
+    "license": "MIT",
     "require": {
         "php": ">=7.4",
         "ext-pdo_sqlite": "*"
