@@ -56,10 +56,13 @@ Configure the library by passing an array of options to the `CleanTalkAntiCrawle
 ```
 
 List of settings:
-db_path              string System path to the SQLite database file
-api_key              string CleanTalk API key (see "Full capabilities" section above)
-min_sync_interval    int    Minimum time interval between synchronizations when using default sync behavior, in seconds
-max_sync_interval    int    Maximum time interval between synchronizations when using default sync behavior, in seconds
-visitor_forget_after int    Time limit for storing visitor data in the library database, in seconds (decrease this if you have storage issues)
-max_rows_before_sync int    Maximum number of requests stored between synchronizations when using default sync behavior
-sync_by_cron         bool   Set this to true to use the cron synchronization mechanism. See `CronSync.php.example`
+
+| Setting | Type | Description |
+| --- | --- | --- |
+| db_path | string | System path to the SQLite database file |
+| api_key | string | CleanTalk API key (see "Full capabilities" section above) |
+| min_sync_interval | int | Minimum time interval between synchronizations when using default sync behavior, in seconds |
+| max_sync_interval | int | Maximum time interval between synchronizations when using default sync behavior, in seconds |
+| visitor_forget_after | int | Time limit for storing visitor data in the library database, in seconds (decrease this if you have storage issues) |
+| max_rows_before_sync | int | Maximum number of requests stored between synchronizations when using default sync behavior |
+| sync_by_cron | bool | Set this to true to use the cron synchronization mechanism. See `CronSync.php.example` |
