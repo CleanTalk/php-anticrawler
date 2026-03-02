@@ -50,6 +50,10 @@ final class SyncManager
 
     public function countRequests(): int
     {
+        if (Settings::$requestsBackend === 'keydb') {
+            return KeyDBManager::countPendingRequests();
+        }
+
         return (int)(
             $this->pdo
                 ->query("SELECT COUNT(1) FROM requests WHERE sync_state = 'idle'")
@@ -121,6 +125,11 @@ final class SyncManager
 
     private function uploadRequestsToDB(string $apiKey): void
     {
+        if (Settings::$requestsBackend === 'keydb') {
+            KeyDBManager::uploadRequestsToDB($apiKey);
+            return;
+        }
+
         $this->pdo->beginTransaction();
             $this->pdo->exec("DELETE FROM requests WHERE sync_state = 'sent'");
             $this->pdo->exec("UPDATE requests SET sync_state = 'sending'");
@@ -178,44 +187,15 @@ final class SyncManager
         }
 
         try {
-            $this->sendDataQuery($apiKey, $data);
+            if (LogsSender::sendDataQuery($apiKey, $data) === false) {
+                throw new Exception('failed to upload request logs');
+            }
         } catch (Exception $e) {
             $this->pdo->exec("UPDATE requests SET sync_state = 'idle' WHERE sync_state = 'sending'");
             throw $e;
         }
 
         $this->pdo->exec("UPDATE requests SET sync_state = 'sent' WHERE sync_state = 'sending'");
-    }
-
-    private function sendDataQuery(string $apiKey, array $data): bool
-    {
-        $postFields = [
-            'timestamp' => time(),
-            'rows' => count($data),
-            'data' => json_encode($data, JSON_UNESCAPED_SLASHES),
-        ];
-
-        $url = 'https://api.cleantalk.org/?method_name=sfw_logs&auth_key=' . urlencode($apiKey);
-
-        $ch = curl_init($url);
-        curl_setopt_array($ch, [
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_TIMEOUT => 5,
-            CURLOPT_FOLLOWLOCATION => true,
-            CURLOPT_POST => true,
-            CURLOPT_POSTFIELDS => http_build_query($postFields),
-        ]);
-
-        $response = curl_exec($ch);
-        if ($response === false) {
-            curl_close($ch);
-            return false;
-        }
-
-        $status = curl_getinfo($ch, CURLINFO_RESPONSE_CODE);
-        curl_close($ch);
-
-        return ($status === 200);
     }
 
     private function setLastSyncDate()

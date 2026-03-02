@@ -28,6 +28,27 @@ class Settings
     /** @var bool */
     public static $syncByCron = false;
 
+    /** @var string */
+    public static $requestsBackend = 'sqlite';
+
+    /** @var string */
+    public static $keyDbHost = '127.0.0.1';
+
+    /** @var int */
+    public static $keyDbPort = 6379;
+
+    /** @var float */
+    public static $keyDbTimeout = 1.5;
+
+    /** @var string */
+    public static $keyDbPassword = '';
+
+    /** @var int */
+    public static $keyDbDatabase = 0;
+
+    /** @var string */
+    public static $keyDbPrefix = 'anticrawler';
+
     /**
      * Configures library settings. This method is called from the CleanTalkAntiCrawler constructor.
      * Array values override config values.
@@ -50,6 +71,13 @@ class Settings
             self::$visitorForgetAfter = $options['visitor_forget_after'] ?? self::$visitorForgetAfter;
             self::$maxRowsBeforeSync  = $options['max_rows_before_sync'] ?? self::$maxRowsBeforeSync;
             self::$syncByCron         = $options['sync_by_cron']         ?? self::$syncByCron;
+            self::$requestsBackend    = $options['requests_backend']     ?? self::$requestsBackend;
+            self::$keyDbHost          = $options['keydb_host']           ?? self::$keyDbHost;
+            self::$keyDbPort          = $options['keydb_port']           ?? self::$keyDbPort;
+            self::$keyDbTimeout       = $options['keydb_timeout']        ?? self::$keyDbTimeout;
+            self::$keyDbPassword      = $options['keydb_password']       ?? self::$keyDbPassword;
+            self::$keyDbDatabase      = $options['keydb_database']       ?? self::$keyDbDatabase;
+            self::$keyDbPrefix        = $options['keydb_prefix']         ?? self::$keyDbPrefix;
         }
     }
 }

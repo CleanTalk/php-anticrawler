@@ -25,6 +25,12 @@ Settings::configure([
     'api_key' => 'put_your_key_here',
     'db_path' => '/tmp/anticrawler.sqlite',
     'visitor_forget_after' => 60 * 60 * 24 * 30,
+    // 'requests_backend' => 'keydb',
+    // 'keydb_host' => '127.0.0.1',
+    // 'keydb_port' => 6379,
+    // 'keydb_database' => 0,
+    // 'keydb_password' => '',
+    // 'keydb_prefix' => 'anticrawler',
 ]);
 $pdo = SQLiteManager::initDb(Settings::$dbPath);
 (new SyncManager($pdo))->syncByCron(Settings::$apiKey);
