@@ -77,9 +77,9 @@ List of settings:
 | keydb_database | int | KeyDB database index |
 | keydb_prefix | string | Prefix for KeyDB request-log keys |
 
-**keydb mode**
+**KeyDB mode**
 
-if your bottleneck is sqlite write amplification on the `requests` table, set:
+SQLite can generate high I/O load when the traffic is high. If you see this, you can set:
 
 ```
     $ac = new CleanTalkAntiCrawler([
@@ -92,4 +92,4 @@ if your bottleneck is sqlite write amplification on the `requests` table, set:
     ]);
 ```
 
-in this mode, only the request-log queue moves to keydb. sqlite is still used for `visitors`, `kv`, `lists`, and `user_agents`
+In this mode, the request-log queue moves to KeyDB. SQLite is still used for `visitors`, `kv`, `lists`, and `user_agents` tables.
