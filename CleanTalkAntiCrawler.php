@@ -6,6 +6,7 @@ namespace Cleantalk\PHPAntiCrawler;
 use Cleantalk\PHPAntiCrawler\RequestDto;
 use Cleantalk\PHPAntiCrawler\ResultDto;
 use Cleantalk\PHPAntiCrawler\Settings;
+use Cleantalk\PHPAntiCrawler\KeyDBManager;
 use Cleantalk\PHPAntiCrawler\SQLiteManager;
 use Cleantalk\PHPAntiCrawler\SyncManager;
 use Exception;
@@ -62,7 +63,12 @@ final class CleanTalkAntiCrawler
         $stmt = $this->pdo->prepare("SELECT ua_id FROM user_agents WHERE ua_name LIKE :ua LIMIT 1");
         $stmt->execute([':ua' => '%' . $request->uaName . '%']);
         $ua = $stmt->fetch();
-        $uaId = !empty($ua) ? (int)$ua['ua_id'] : 0;
+        $request->uaId = !empty($ua) ? (int)$ua['ua_id'] : 0;
+
+        if (Settings::$requestsBackend === 'keydb') {
+            KeyDBManager::storeRequest($request, $result);
+            return;
+        }
 
         $stmt = $this->pdo->prepare(<<<SQL
             INSERT INTO requests
@@ -77,7 +83,7 @@ final class CleanTalkAntiCrawler
             $result->goodRequest ? 0 : 1,
             time(),
             $request->uaName,
-            $uaId,
+            $request->uaId,
             $request->url,
             $result->status,
         ]);

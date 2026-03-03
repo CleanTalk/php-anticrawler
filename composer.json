@@ -3,6 +3,9 @@
     "description": "Simple Anti-Crawler library for PHP websites by CleanTalk",
     "type": "library",
     "license": "MIT",
+    "suggest": {
+        "ext-redis": "required when requests_backend is set to keydb"
+    },
     "require": {
         "php": ">=7.4",
         "ext-pdo_sqlite": "*"

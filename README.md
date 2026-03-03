@@ -51,7 +51,10 @@ Configure the library by passing an array of options to the `CleanTalkAntiCrawle
 ```
     $ac = new CleanTalkAntiCrawler([
         'db_path' => '/tmp/mydatabase.sqlite',
-        'visitor_forget_after' => 60 * 60
+        'visitor_forget_after' => 60 * 60,
+        // 'requests_backend' => 'keydb',
+        // 'keydb_host' => '127.0.0.1',
+        // 'keydb_port' => 6379,
     ]);
 ```
 
@@ -66,3 +69,27 @@ List of settings:
 | visitor_forget_after | int | Time limit for storing visitor data in the library database, in seconds (decrease this if you have storage issues) |
 | max_rows_before_sync | int | Maximum number of requests stored between synchronizations when using default sync behavior |
 | sync_by_cron | bool | Set this to true to use the cron synchronization mechanism. See `CronSync.php.example` |
+| requests_backend | string | Request log backend: `sqlite` (default) or `keydb` |
+| keydb_host | string | KeyDB host, used when `requests_backend` is `keydb` |
+| keydb_port | int | KeyDB port, used when `requests_backend` is `keydb` |
+| keydb_timeout | float | Connection timeout for KeyDB, in seconds |
+| keydb_password | string | KeyDB password, if required |
+| keydb_database | int | KeyDB database index |
+| keydb_prefix | string | Prefix for KeyDB request-log keys |
+
+**KeyDB mode**
+
+SQLite can generate high I/O load when the traffic is high. If you see this, you can set:
+
+```
+    $ac = new CleanTalkAntiCrawler([
+        'db_path' => '/tmp/mydatabase.sqlite',
+        'requests_backend' => 'keydb',
+        'keydb_host' => '127.0.0.1',
+        'keydb_port' => 6379,
+        'keydb_database' => 0,
+        'keydb_prefix' => 'anticrawler',
+    ]);
+```
+
+In this mode, the request-log queue moves to KeyDB. SQLite is still used for `visitors`, `kv`, `lists`, and `user_agents` tables.
