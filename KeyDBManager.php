@@ -7,6 +7,36 @@ use RuntimeException;
 
 final class KeyDBManager
 {
+    public static function saveVisitor(RequestDto $request): bool
+    {
+        $redis = self::connectFromSettings();
+        $payload = json_encode([
+            'ip' => $request->ip,
+            'ua' => $request->uaName,
+            'created_at' => time(),
+        ], JSON_UNESCAPED_SLASHES);
+
+        $result = $redis->set(
+            self::visitorKey($request->fingerprint),
+            $payload === false ? '{}' : $payload,
+            ['nx', 'ex' => self::visitorTtl()]
+        );
+
+        return $result === true;
+    }
+
+    public static function updateLastSeen(RequestDto $request): void
+    {
+        $redis = self::connectFromSettings();
+        $key = self::visitorKey($request->fingerprint);
+
+        if ((int)$redis->exists($key) !== 1) {
+            return;
+        }
+
+        $redis->expire($key, self::visitorTtl());
+    }
+
     public static function storeRequest(RequestDto $request, ResultDto $result): void
     {
         $payload = json_encode([
@@ -177,5 +207,15 @@ final class KeyDBManager
         $normalizedPrefix = trim(Settings::$keyDbPrefix);
 
         return $normalizedPrefix === '' ? 'anticrawler' : $normalizedPrefix;
+    }
+
+    private static function visitorKey(string $fingerprint): string
+    {
+        return self::prefix() . ':visitors:' . $fingerprint;
+    }
+
+    private static function visitorTtl(): int
+    {
+        return max(1, (int)Settings::$visitorForgetAfter);
     }
 }

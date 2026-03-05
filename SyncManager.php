@@ -119,6 +119,10 @@ final class SyncManager
 
     private function cleanOldVisitorsData(): void
     {
+        if (Settings::$requestsBackend === 'keydb') {
+            return;
+        }
+
         $threshold = time() - Settings::$visitorForgetAfter;
         $this->pdo->exec("DELETE FROM visitors WHERE last_seen < {$threshold}");
     }

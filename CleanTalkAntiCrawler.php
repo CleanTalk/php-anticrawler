@@ -164,6 +164,10 @@ final class CleanTalkAntiCrawler
 
     private function saveVisitor(RequestDto $request): bool
     {
+        if (Settings::$requestsBackend === 'keydb') {
+            return KeyDBManager::saveVisitor($request);
+        }
+
         $now = time();
 
         $stmt = $this->pdo->prepare('
@@ -185,6 +189,11 @@ final class CleanTalkAntiCrawler
 
     private function updateLastSeen(RequestDto $request): void
     {
+        if (Settings::$requestsBackend === 'keydb') {
+            KeyDBManager::updateLastSeen($request);
+            return;
+        }
+
         $now = time();
 
         $stmt = $this->pdo->prepare('UPDATE visitors SET last_seen = :l WHERE fingerprint = :fp');
