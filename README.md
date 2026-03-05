@@ -69,7 +69,7 @@ List of settings:
 | visitor_forget_after | int | Time limit for storing visitor data in the library database, in seconds (decrease this if you have storage issues) |
 | max_rows_before_sync | int | Maximum number of requests stored between synchronizations when using default sync behavior |
 | sync_by_cron | bool | Set this to true to use the cron synchronization mechanism. See `CronSync.php.example` |
-| requests_backend | string | Request log backend: `sqlite` (default) or `keydb` |
+| requests_backend | string | Backend switch for both request logs and visitor-state data: `sqlite` (default) or `keydb` |
 | keydb_host | string | KeyDB host, used when `requests_backend` is `keydb` |
 | keydb_port | int | KeyDB port, used when `requests_backend` is `keydb` |
 | keydb_timeout | float | Connection timeout for KeyDB, in seconds |
@@ -85,6 +85,7 @@ SQLite can generate high I/O load when the traffic is high. If you see this, you
     $ac = new CleanTalkAntiCrawler([
         'db_path' => '/tmp/mydatabase.sqlite',
         'requests_backend' => 'keydb',
+        'visitor_forget_after' => 60 * 60 * 24 * 30,
         'keydb_host' => '127.0.0.1',
         'keydb_port' => 6379,
         'keydb_database' => 0,
@@ -92,4 +93,5 @@ SQLite can generate high I/O load when the traffic is high. If you see this, you
     ]);
 ```
 
-In this mode, the request-log queue moves to KeyDB. SQLite is still used for `visitors`, `kv`, `lists`, and `user_agents` tables.
+In this mode, request logs and visitor presence data are stored in KeyDB. `visitor_forget_after` is applied as visitor key TTL.
+SQLite is still used for `kv`, `lists`, and `user_agents` tables.

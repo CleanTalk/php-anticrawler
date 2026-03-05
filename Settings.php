@@ -5,7 +5,7 @@ namespace Cleantalk\PHPAntiCrawler;
 class Settings
 {
     /** @var string */
-    public const VERSION = 'phpanticrawler-1.0.35';
+    public const VERSION = 'phpanticrawler-1.0.36';
 
     /** @var string */
     public static $dbPath = __DIR__ . '/anticrawler.sqlite';
