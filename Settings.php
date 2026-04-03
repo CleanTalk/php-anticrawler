@@ -23,7 +23,7 @@ class Settings
     public static $visitorForgetAfter = 60 * 60 * 24 * 30; // One month
 
     /** @var int */
-    public static $pendingRequestsMaxLength = 200000;
+    public static $pendingRequestsMaxLength = 100000;
 
     /** @var int */
     public static $maxRowsBeforeSync = 20000;

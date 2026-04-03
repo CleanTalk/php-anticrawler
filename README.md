@@ -67,7 +67,7 @@ List of settings:
 | min_sync_interval | int | Minimum time interval between synchronizations when using default sync behavior, in seconds |
 | max_sync_interval | int | Maximum time interval between synchronizations when using default sync behavior, in seconds |
 | visitor_forget_after | int | Time limit for storing visitor data in the library database, in seconds (decrease this if you have storage issues) |
-| pending_requests_max_length | int | Maximum number of request entries retained in the KeyDB pending queue. Defaults to `200000`; older entries are trimmed away |
+| pending_requests_max_length | int | Maximum number of request entries retained in the KeyDB pending queue. Defaults to `100000`; older entries are trimmed away |
 | max_rows_before_sync | int | Maximum number of requests stored between synchronizations when using default sync behavior |
 | sync_by_cron | bool | Set this to true to use the cron synchronization mechanism. See `CronSync.php.example` |
 | requests_backend | string | Backend switch for both request logs and visitor-state data: `sqlite` (default) or `keydb` |
