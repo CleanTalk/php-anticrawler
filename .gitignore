@@ -3,3 +3,4 @@
 *.sqlite-wal
 *.sqlite3
 vendor
+.codex
