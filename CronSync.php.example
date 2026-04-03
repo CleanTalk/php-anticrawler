@@ -25,6 +25,7 @@ Settings::configure([
     'api_key' => 'put_your_key_here',
     'db_path' => '/tmp/anticrawler.sqlite',
     'visitor_forget_after' => 60 * 60 * 24 * 30,
+    // 'pending_requests_max_length' => 200000,
     // 'requests_backend' => 'keydb',
     // 'keydb_host' => '127.0.0.1',
     // 'keydb_port' => 6379,

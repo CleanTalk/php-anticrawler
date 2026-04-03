@@ -50,7 +50,9 @@ final class KeyDBManager
             'request_status' => $result->status,
         ], JSON_UNESCAPED_SLASHES);
 
-        self::connectFromSettings()->rPush(self::pendingKey(), $payload === false ? '{}' : $payload);
+        $redis = self::connectFromSettings();
+        $redis->rPush(self::pendingKey(), $payload === false ? '{}' : $payload);
+        $redis->lTrim(self::pendingKey(), -self::pendingRequestsMaxLength(), -1);
     }
 
     public static function countPendingRequests(): int
@@ -217,5 +219,10 @@ final class KeyDBManager
     private static function visitorTtl(): int
     {
         return max(1, (int)Settings::$visitorForgetAfter);
+    }
+
+    private static function pendingRequestsMaxLength(): int
+    {
+        return max(1, (int)Settings::$pendingRequestsMaxLength);
     }
 }
