@@ -5,7 +5,7 @@ namespace Cleantalk\PHPAntiCrawler;
 class Settings
 {
     /** @var string */
-    public const VERSION = 'phpanticrawler-1.0.36';
+    public const VERSION = 'phpanticrawler-1.0.37';
 
     /** @var string */
     public static $dbPath = __DIR__ . '/anticrawler.sqlite';
@@ -21,6 +21,9 @@ class Settings
 
     /** @var int */
     public static $visitorForgetAfter = 60 * 60 * 24 * 30; // One month
+
+    /** @var int */
+    public static $pendingRequestsMaxLength = 100000;
 
     /** @var int */
     public static $maxRowsBeforeSync = 20000;
@@ -69,6 +72,8 @@ class Settings
             self::$minSyncInterval    = $options['min_sync_interval']    ?? self::$minSyncInterval;
             self::$maxSyncInterval    = $options['max_sync_interval']    ?? self::$maxSyncInterval;
             self::$visitorForgetAfter = $options['visitor_forget_after'] ?? self::$visitorForgetAfter;
+            self::$pendingRequestsMaxLength = $options['pending_requests_max_length']
+                ?? self::$pendingRequestsMaxLength;
             self::$maxRowsBeforeSync  = $options['max_rows_before_sync'] ?? self::$maxRowsBeforeSync;
             self::$syncByCron         = $options['sync_by_cron']         ?? self::$syncByCron;
             self::$requestsBackend    = $options['requests_backend']     ?? self::$requestsBackend;
