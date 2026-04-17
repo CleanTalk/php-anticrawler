@@ -238,7 +238,7 @@ final class SyncManager
                 ->fetchColumn() ?? 0
         );
 
-        return (time() - $lastImportFailUnixTime) < 300;
+        return (time() - $lastImportFailUnixTime) < 30;
     }
 
     public function updateListsAndAgents(string $apiKey)
