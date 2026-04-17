@@ -42,7 +42,7 @@ final class SyncManager
     {
         $lastSyncUnixTime = (int)(
             $this->pdo
-                ->query("SELECT v FROM kv WHERE k = 'last_synchronization'")
+                ->query("SELECT v FROM kv WHERE k = 'last_export'")
                 ->fetchColumn() ?? 0
         );
         return (time() - $lastSyncUnixTime);
@@ -77,7 +77,7 @@ final class SyncManager
                     $this->setLastImportFailDate();
                     $foo = (int)(
                         $this->pdo
-                            ->query("SELECT v FROM kv WHERE k = 'last_import_date'")
+                            ->query("SELECT v FROM kv WHERE k = 'last_import'")
                             ->fetchColumn() ?? 0
                     );
                     error_log('AntiCrawler failed to update filtering lists. Last import date: ' . date("Y-m-d H:i:s", $foo));
@@ -217,12 +217,12 @@ final class SyncManager
 
     private function setLastExportDate()
     {
-        $this->pdo->exec("UPDATE kv SET v = " . time() . " WHERE k = 'last_synchronization'");
+        $this->pdo->exec("UPDATE kv SET v = " . time() . " WHERE k = 'last_export'");
     }
 
     private function setLastImportDate()
     {
-        $this->pdo->exec("UPDATE kv SET v = " . time() . " WHERE k = 'last_import_date'");
+        $this->pdo->exec("UPDATE kv SET v = " . time() . " WHERE k = 'last_import'");
     }
 
     private function setLastImportFailDate()
