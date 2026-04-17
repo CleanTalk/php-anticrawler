@@ -75,12 +75,12 @@ final class SyncManager
                     $this->setLastImportDate();
                 } catch (Exception $e) {
                     $this->setLastImportFailDate();
-                    $foo = (int)(
+                    $lastImportTs = (int)(
                         $this->pdo
                             ->query("SELECT v FROM kv WHERE k = 'last_import'")
                             ->fetchColumn() ?? 0
                     );
-                    error_log('AntiCrawler failed to update filtering lists. Last import date: ' . date("Y-m-d H:i:s", $foo));
+                    error_log('AntiCrawler failed to update filtering lists. Last import date: ' . date("Y-m-d H:i:s", $lastImportTs));
                 }
             }
             $this->uploadRequestsToDB($apiKey);
