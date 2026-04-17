@@ -69,10 +69,23 @@ final class SyncManager
         try {
             $this->declareAppVersion();
             $this->cleanOldVisitorsData();
-            $this->updateListsAndAgents($apiKey);
+            if ($this->importRecentlyFailed() === false) {
+                try {
+                    $this->updateListsAndAgents($apiKey);
+                    $this->setLastImportDate();
+                } catch (Exception $e) {
+                    $this->setLastImportFailDate();
+                    $foo = (int)(
+                        $this->pdo
+                            ->query("SELECT v FROM kv WHERE k = 'last_import_date'")
+                            ->fetchColumn() ?? 0
+                    );
+                    error_log('AntiCrawler failed to update filtering lists. Last import date: ' . date("Y-m-d H:i:s", $foo));
+                }
+            }
             $this->uploadRequestsToDB($apiKey);
 
-            $this->setLastSyncDate();
+            $this->setLastExportDate();
         } finally {
             $this->removeSyncLock();
         }
@@ -202,9 +215,30 @@ final class SyncManager
         $this->pdo->exec("UPDATE requests SET sync_state = 'sent' WHERE sync_state = 'sending'");
     }
 
-    private function setLastSyncDate()
+    private function setLastExportDate()
     {
         $this->pdo->exec("UPDATE kv SET v = " . time() . " WHERE k = 'last_synchronization'");
+    }
+
+    private function setLastImportDate()
+    {
+        $this->pdo->exec("UPDATE kv SET v = " . time() . " WHERE k = 'last_import_date'");
+    }
+
+    private function setLastImportFailDate()
+    {
+        $this->pdo->exec("UPDATE kv SET v = " . time() . " WHERE k = 'last_import_fail_date'");
+    }
+
+    private function importRecentlyFailed(): bool
+    {
+        $lastImportFailUnixTime = (int)(
+            $this->pdo
+                ->query("SELECT v FROM kv WHERE k = 'last_import_fail_date'")
+                ->fetchColumn() ?? 0
+        );
+
+        return (time() - $lastImportFailUnixTime) < 300;
     }
 
     public function updateListsAndAgents(string $apiKey)
