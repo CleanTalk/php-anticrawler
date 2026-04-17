@@ -42,7 +42,7 @@ final class SyncManager
     {
         $lastSyncUnixTime = (int)(
             $this->pdo
-                ->query("SELECT v FROM kv WHERE k = 'last_synchronization'")
+                ->query("SELECT v FROM kv WHERE k = 'last_export'")
                 ->fetchColumn() ?? 0
         );
         return (time() - $lastSyncUnixTime);
@@ -69,10 +69,23 @@ final class SyncManager
         try {
             $this->declareAppVersion();
             $this->cleanOldVisitorsData();
-            $this->updateListsAndAgents($apiKey);
+            if ($this->importRecentlyFailed() === false) {
+                try {
+                    $this->updateListsAndAgents($apiKey);
+                    $this->setLastImportDate();
+                } catch (Exception $e) {
+                    $this->setLastImportFailDate();
+                    $lastImportTs = (int)(
+                        $this->pdo
+                            ->query("SELECT v FROM kv WHERE k = 'last_import'")
+                            ->fetchColumn() ?? 0
+                    );
+                    error_log('AntiCrawler failed to update filtering lists. Last import date: ' . date("Y-m-d H:i:s", $lastImportTs));
+                }
+            }
             $this->uploadRequestsToDB($apiKey);
 
-            $this->setLastSyncDate();
+            $this->setLastExportDate();
         } finally {
             $this->removeSyncLock();
         }
@@ -202,9 +215,30 @@ final class SyncManager
         $this->pdo->exec("UPDATE requests SET sync_state = 'sent' WHERE sync_state = 'sending'");
     }
 
-    private function setLastSyncDate()
+    private function setLastExportDate()
     {
-        $this->pdo->exec("UPDATE kv SET v = " . time() . " WHERE k = 'last_synchronization'");
+        $this->pdo->exec("UPDATE kv SET v = " . time() . " WHERE k = 'last_export'");
+    }
+
+    private function setLastImportDate()
+    {
+        $this->pdo->exec("UPDATE kv SET v = " . time() . " WHERE k = 'last_import'");
+    }
+
+    private function setLastImportFailDate()
+    {
+        $this->pdo->exec("UPDATE kv SET v = " . time() . " WHERE k = 'last_import_fail_date'");
+    }
+
+    private function importRecentlyFailed(): bool
+    {
+        $lastImportFailTs = (int)(
+            $this->pdo
+                ->query("SELECT v FROM kv WHERE k = 'last_import_fail_date'")
+                ->fetchColumn() ?? 0
+        );
+
+        return (time() - $lastImportFailTs) < 30;
     }
 
     public function updateListsAndAgents(string $apiKey)
