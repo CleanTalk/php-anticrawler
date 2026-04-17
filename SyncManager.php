@@ -232,13 +232,13 @@ final class SyncManager
 
     private function importRecentlyFailed(): bool
     {
-        $lastImportFailUnixTime = (int)(
+        $lastImportFailTs = (int)(
             $this->pdo
                 ->query("SELECT v FROM kv WHERE k = 'last_import_fail_date'")
                 ->fetchColumn() ?? 0
         );
 
-        return (time() - $lastImportFailUnixTime) < 30;
+        return (time() - $lastImportFailTs) < 30;
     }
 
     public function updateListsAndAgents(string $apiKey)
