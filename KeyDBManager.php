@@ -14,11 +14,11 @@ final class KeyDBManager
             'ip' => $request->ip,
             'ua' => $request->uaName,
             'created_at' => time(),
-        ], JSON_UNESCAPED_SLASHES);
+        ], JSON_UNESCAPED_SLASHES | JSON_INVALID_UTF8_SUBSTITUTE | JSON_THROW_ON_ERROR);
 
         $result = $redis->set(
             self::visitorKey($request->fingerprint),
-            $payload === false ? '{}' : $payload,
+            $payload,
             ['nx', 'ex' => self::visitorTtl()]
         );
 
@@ -48,10 +48,10 @@ final class KeyDBManager
             'ua_id' => $request->uaId,
             'url' => $request->url,
             'request_status' => $result->status,
-        ], JSON_UNESCAPED_SLASHES);
+        ], JSON_UNESCAPED_SLASHES | JSON_INVALID_UTF8_SUBSTITUTE | JSON_THROW_ON_ERROR);
 
         $redis = self::connectFromSettings();
-        $redis->rPush(self::pendingKey(), $payload === false ? '{}' : $payload);
+        $redis->rPush(self::pendingKey(), $payload);
         $redis->lTrim(self::pendingKey(), -self::pendingRequestsMaxLength(), -1);
     }
 

@@ -3,8 +3,26 @@ declare(strict_types=1);
 
 namespace Cleantalk\PHPAntiCrawler;
 
+use JsonException;
+use RuntimeException;
+
 final class LogsSender
 {
+    /**
+     * @param array<int, array<int, mixed>> $data
+     */
+    public static function serializeData(array $data): string
+    {
+        try {
+            return json_encode(
+                $data,
+                JSON_UNESCAPED_SLASHES | JSON_INVALID_UTF8_SUBSTITUTE | JSON_THROW_ON_ERROR
+            );
+        } catch (JsonException $e) {
+            throw new RuntimeException('Failed to serialize request logs: ' . $e->getMessage(), 0, $e);
+        }
+    }
+
     /**
      * @param array<int, array<int, mixed>> $data
      */
@@ -13,7 +31,7 @@ final class LogsSender
         $postFields = [
             'timestamp' => time(),
             'rows' => count($data),
-            'data' => json_encode($data, JSON_UNESCAPED_SLASHES),
+            'data' => self::serializeData($data),
         ];
 
         $url = 'https://api.cleantalk.org/?method_name=sfw_logs&auth_key=' . urlencode($apiKey);
