@@ -96,3 +96,75 @@ SQLite can generate high I/O load when the traffic is high. If you see this, you
 
 In this mode, request logs and visitor presence data are stored in KeyDB. `visitor_forget_after` is applied as visitor key TTL, and `pending_requests_max_length` caps the pending request list by count.
 SQLite is still used for `kv`, `lists`, and `user_agents` tables.
+
+**List of support User-Agents (bots)** 
+
+- admantx.com
+- AhrefsBot
+- Akamai crawler
+- Alexabot
+- Amazonbot
+- AndiBot
+- Applebot
+- archive.org_bot
+- AspiegelBot - HuaweiWebCatBot
+- Babbar.tech (Barkrowler)
+- Baidu
+- Better Uptime Bot
+- Bing
+- Bravebot
+- BrightLocalBot
+- CleanTalk Uptime bot
+- CloudFlare crawler
+- DuckDuckGo
+- FacebookBot
+- FeedBurner
+- Feedly Fetcher
+- FreshpingBot
+- Google
+- Grapeshot
+- GTmetrix
+- GumGum-Bot
+- HuaweiWebCatBot
+- Hypefactors
+- KomoBot
+- Lighthouse
+- Mail.ru
+- MailChimp
+- Majestic MJ12bot
+- Meetedgar.com
+- MirrorWeb
+- Petalbot
+- PhindBot
+- Pingdom.com bot
+- Pinterest bot
+- Printful WooCommerce Integration
+- proximic
+- Qwant Web crawler
+- Rambler bot
+- RankMathApi
+- RapidLoad (rapidload.io)
+- Reddit
+- Rogerbot - MOZ.com
+- Screaming Frog SEO Spider
+- Semrush
+- SEOkicks-Robot
+- serpstatbot
+- Seznam
+- ShipStation
+- ShortPixel Image Optimizer
+- Site24x7
+- Sitechecker
+- sogou spider
+- StatusCake
+- Sucuri Uptime Monitor
+- UptimeRobot.com
+- WaldoBot
+- Wikipedia crawler
+- WooCommerce API
+- wordoftravel: Find Travel Blogs and Explore Destinations
+- WP Engine Smart Plugin Manager
+- WP Rocket
+- WPCompress
+- Yandex
+- YouBot
