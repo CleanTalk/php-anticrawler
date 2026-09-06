@@ -87,7 +87,13 @@ final class SyncManager
 
             $this->setLastExportDate();
         } finally {
-            $this->removeSyncLock();
+            try {
+                if ($this->pdo->inTransaction()) {
+                    $this->pdo->rollBack();
+                }
+            } finally {
+                $this->removeSyncLock();
+            }
         }
     }
 
