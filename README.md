@@ -1,6 +1,13 @@
 # Anti-Crawler PHP Library by CleanTalk
 
-Simple anti-crawler library for PHP websites, with optional checks against CleanTalk block lists, allow lists, and User-Agent database.
+PHP library to block unwanted crawlers, scrapers and bad bots by User-Agent, IP block lists and allow lists. No captcha, no challenge pages for real visitors - works on any PHP site and is powered by the CleanTalk bot database.
+
+**What it does**
+
+- Blocks scrapers, SEO crawlers and scanner bots before they reach your page logic.
+- Recognises 70+ known bots by User-Agent (see the list at the end) and lets you decide which of them to allow.
+- Optionally checks every visitor against CleanTalk block lists and allow lists with your API key.
+- Stores visitor state in SQLite or KeyDB, so it runs on shared hosting as well as on a cluster.
 
 **Installation**
 
@@ -97,7 +104,23 @@ SQLite can generate high I/O load when the traffic is high. If you see this, you
 In this mode, request logs and visitor presence data are stored in KeyDB. `visitor_forget_after` is applied as visitor key TTL, and `pending_requests_max_length` caps the pending request list by count.
 SQLite is still used for `kv`, `lists`, and `user_agents` tables.
 
-**List of support User-Agents (bots)** 
+**Why not a captcha**
+
+A captcha challenges every visitor, including the real ones, and modern bots solve it anyway. This library decides on the server side, before the page is rendered: a visitor with a known bot User-Agent, a blocked IP or crawler-like behaviour gets the access denied screen, and everyone else sees the page as usual. Nothing is shown to real people, nothing has to be clicked.
+
+**How it compares**
+
+| Approach | Stops bots that ignore rules | Real visitors affected | Keeps working when bots change IP |
+|---|---|---|---|
+| `robots.txt` | No - it is a request, not a block | No | Not applicable |
+| Blocking IP ranges by hand | Partly | Sometimes, when a range is shared | No |
+| Captcha on every page | Partly | Yes, everyone clicks | Yes |
+| **This library** | Yes | No | Yes, with CleanTalk lists updated from the cloud |
+
+**List of supported User-Agents (bots)**
+
+The same list is maintained in the CleanTalk help center: https://cleantalk.org/help/filter-ua
+
 
 - admantx.com
 - AhrefsBot
@@ -168,3 +191,9 @@ SQLite is still used for `kv`, `lists`, and `user_agents` tables.
 - WPCompress
 - Yandex
 - YouBot
+
+**Related projects by CleanTalk**
+
+- [anti-ddos-lite](https://github.com/CleanTalk/anti-ddos-lite) - small PHP app that protects a site from HTTP flood and DDoS-like traffic.
+- [php-antispam](https://github.com/CleanTalk/php-antispam) - PHP client for the CleanTalk Anti-Spam API: checks comments, registrations and form submissions.
+- [wordpress-antispam](https://github.com/CleanTalk/wordpress-antispam) - the WordPress plugin with SpamFireWall, Anti-Crawler and Anti-Flood built in.
