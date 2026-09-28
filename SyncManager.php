@@ -7,9 +7,14 @@ use Cleantalk\PHPAntiCrawler\Settings;
 use Exception;
 use PDO;
 use RuntimeException;
+use Throwable;
 
 final class SyncManager
 {
+    private const SYNC_LOG_PATH = '/tmp/anticrawler_error_log';
+
+    private static bool $syncLogWriteFailed = false;
+
     private PDO $pdo;
 
     public function __construct(PDO $pdo)
@@ -68,14 +73,32 @@ final class SyncManager
         if ($lock === false) {
             return;
         }
+
+        $syncId = getmypid() . '-' . str_replace('.', '', uniqid('', true));
+        $startedAt = microtime(true);
+        $stage = 'lock_acquired';
+        $this->logSyncEvent($syncId, $stage, $startedAt);
+
         try {
+            $stage = 'version_feedback';
+            $this->logSyncEvent($syncId, $stage, $startedAt);
             $this->declareAppVersion();
+
+            $stage = 'visitor_cleanup';
+            $this->logSyncEvent($syncId, $stage, $startedAt);
             $this->cleanOldVisitorsData();
+
             if ($this->importRecentlyFailed() === false) {
                 try {
+                    $stage = 'list_import';
+                    $this->logSyncEvent($syncId, $stage, $startedAt);
                     $this->updateListsAndAgents($apiKey);
                     $this->setLastImportDate();
                 } catch (Exception $e) {
+                    $this->logSyncEvent($syncId, 'list_import_failed', $startedAt, [
+                        'error_class' => get_class($e),
+                        'error' => substr($e->getMessage(), 0, 500),
+                    ]);
                     $this->setLastImportFailDate();
                     $lastImportTs = (int)(
                         $this->pdo
@@ -85,9 +108,22 @@ final class SyncManager
                     error_log('AntiCrawler failed to update filtering lists. Last import date: ' . date("Y-m-d H:i:s", $lastImportTs));
                 }
             }
-            $this->uploadRequestsToDB($apiKey);
 
+            $stage = 'request_export';
+            $this->logSyncEvent($syncId, $stage, $startedAt);
+            $this->uploadRequestsToDB($apiKey, $syncId, $startedAt);
+
+            $stage = 'export_timestamp';
+            $this->logSyncEvent($syncId, $stage, $startedAt);
             $this->setLastExportDate();
+            $this->logSyncEvent($syncId, 'completed', $startedAt);
+        } catch (Throwable $e) {
+            $this->logSyncEvent($syncId, 'failed', $startedAt, [
+                'stage' => $stage,
+                'error_class' => get_class($e),
+                'error' => substr($e->getMessage(), 0, 500),
+            ]);
+            throw $e;
         } finally {
             try {
                 if ($this->pdo->inTransaction()) {
@@ -96,6 +132,28 @@ final class SyncManager
             } finally {
                 flock($lock, LOCK_UN);
                 fclose($lock);
+            }
+        }
+    }
+
+    private function logSyncEvent(string $syncId, string $event, float $startedAt, array $details = []): void
+    {
+        $entry = array_merge([
+            'time_utc' => gmdate('Y-m-d\TH:i:s\Z'),
+            'sync_id' => $syncId,
+            'pid' => getmypid(),
+            'database' => basename(Settings::$dbPath),
+            'backend' => Settings::$requestsBackend,
+            'event' => $event,
+            'elapsed_ms' => (int)round((microtime(true) - $startedAt) * 1000),
+            'peak_memory_mb' => (int)ceil(memory_get_peak_usage(true) / 1048576),
+        ], $details);
+
+        $line = json_encode($entry, JSON_INVALID_UTF8_SUBSTITUTE);
+        if ($line !== false && @file_put_contents(self::SYNC_LOG_PATH, $line . "\n", FILE_APPEND | LOCK_EX) === false) {
+            if (self::$syncLogWriteFailed === false) {
+                error_log('AntiCrawler could not write synchronization diagnostics to ' . self::SYNC_LOG_PATH);
+                self::$syncLogWriteFailed = true;
             }
         }
     }
@@ -151,14 +209,17 @@ final class SyncManager
         $this->pdo->exec("DELETE FROM visitors WHERE last_seen < {$threshold}");
     }
 
-    private function uploadRequestsToDB(string $apiKey): void
+    private function uploadRequestsToDB(string $apiKey, string $syncId, float $startedAt): void
     {
         if (Settings::$requestsBackend === 'keydb') {
+            $this->logSyncEvent($syncId, 'keydb_upload', $startedAt);
             KeyDBManager::uploadRequestsToDB($apiKey);
             return;
         }
 
+        $this->logSyncEvent($syncId, 'batch_prepare', $startedAt);
         $rows = $this->prepareRequestsForUpload();
+        $this->logSyncEvent($syncId, 'batch_prepared', $startedAt, ['aggregated_rows' => count($rows)]);
 
         $data = [];
         foreach($rows as $row) {
@@ -174,11 +235,13 @@ final class SyncManager
             ];
         }
 
+        $this->logSyncEvent($syncId, 'batch_upload', $startedAt, ['aggregated_rows' => count($data)]);
         if (LogsSender::sendDataQuery($apiKey, $data) === false) {
             throw new Exception('failed to upload request logs');
         }
 
         $this->pdo->exec("UPDATE requests SET sync_state = 'sent' WHERE sync_state = 'sending'");
+        $this->logSyncEvent($syncId, 'batch_uploaded', $startedAt, ['aggregated_rows' => count($data)]);
     }
 
     private function prepareRequestsForUpload(): array
