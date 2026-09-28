@@ -6,6 +6,7 @@ namespace Cleantalk\PHPAntiCrawler;
 use Cleantalk\PHPAntiCrawler\Settings;
 use Exception;
 use PDO;
+use RuntimeException;
 
 final class SyncManager
 {
@@ -63,7 +64,8 @@ final class SyncManager
 
     public function syncData(string $apiKey): void
     {
-        if (!$this->tryAcquireSyncLock()) {
+        $lock = $this->tryAcquireSyncLock();
+        if ($lock === false) {
             return;
         }
         try {
@@ -92,24 +94,27 @@ final class SyncManager
                     $this->pdo->rollBack();
                 }
             } finally {
-                $this->removeSyncLock();
+                flock($lock, LOCK_UN);
+                fclose($lock);
             }
         }
     }
 
-    private function tryAcquireSyncLock(): bool
+    /** @return resource|false */
+    private function tryAcquireSyncLock()
     {
-        $stmt = $this->pdo->prepare(
-            "UPDATE kv SET v = '1' WHERE k = 'sync_in_process' AND v = '0'"
-        );
-        $stmt->execute();
+        // Keep this file in place: unlinking it can let workers lock different inodes.
+        $lock = @fopen(Settings::$dbPath . '.sync.lock', 'c');
+        if ($lock === false) {
+            throw new RuntimeException('Unable to open AntiCrawler synchronization lock file');
+        }
 
-        return $stmt->rowCount() === 1;
-    }
+        if (!flock($lock, LOCK_EX | LOCK_NB)) {
+            fclose($lock);
+            return false;
+        }
 
-    private function removeSyncLock(): void
-    {
-        $this->pdo->exec("UPDATE kv SET v = '0' WHERE k = 'sync_in_process'");
+        return $lock;
     }
 
     private function declareAppVersion(): void

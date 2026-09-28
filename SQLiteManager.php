@@ -107,7 +107,6 @@ final class SQLiteManager
         $pdo->exec("INSERT OR IGNORE INTO kv(k, v) VALUES ('last_import', '0');");
         $pdo->exec("INSERT OR IGNORE INTO kv(k, v) VALUES ('last_import_fail_date', '0');");
         $pdo->exec("INSERT OR IGNORE INTO kv(k, v) VALUES ('last_key_check', '0');");
-        $pdo->exec("INSERT OR IGNORE INTO kv(k, v) VALUES ('sync_in_process', '0');");
 
         return $pdo;
     }
