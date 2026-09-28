@@ -158,9 +158,36 @@ final class SyncManager
             return;
         }
 
+        $rows = $this->prepareRequestsForUpload();
+
+        $data = [];
+        foreach($rows as $row) {
+            $data[] = [
+                $row['ip'],
+                $row['total_requests'],
+                $row['total_requests'] - $row['total_blocked'],
+                $row['last_request'],
+                $row['request_status'],
+                $row['ua_name'],
+                $row['ua_id'],
+                ['fu' => $row['first_visited_url'], 'lu' => $row['last_visited_url']],
+            ];
+        }
+
+        if (LogsSender::sendDataQuery($apiKey, $data) === false) {
+            throw new Exception('failed to upload request logs');
+        }
+
+        $this->pdo->exec("UPDATE requests SET sync_state = 'sent' WHERE sync_state = 'sending'");
+    }
+
+    private function prepareRequestsForUpload(): array
+    {
         $this->pdo->beginTransaction();
-            $this->pdo->exec("DELETE FROM requests WHERE sync_state = 'sent'");
-            $this->pdo->exec("UPDATE requests SET sync_state = 'sending'");
+            // A previous upload may have reached the server before its worker died.
+            // Drop that uncertain batch instead of risking a duplicate upload.
+            $this->pdo->exec("DELETE FROM requests WHERE sync_state IN ('sent', 'sending')");
+            $this->pdo->exec("UPDATE requests SET sync_state = 'sending' WHERE sync_state = 'idle'");
             $stmt = $this->pdo->query(<<<SQL
                 WITH ranked AS (
                     SELECT
@@ -200,30 +227,7 @@ final class SyncManager
             $rows = $stmt->fetchAll();
         $this->pdo->commit();
 
-        $data = [];
-        foreach($rows as $row) {
-            $data[] = [
-                $row['ip'],
-                $row['total_requests'],
-                $row['total_requests'] - $row['total_blocked'],
-                $row['last_request'],
-                $row['request_status'],
-                $row['ua_name'],
-                $row['ua_id'],
-                ['fu' => $row['first_visited_url'], 'lu' => $row['last_visited_url']],
-            ];
-        }
-
-        try {
-            if (LogsSender::sendDataQuery($apiKey, $data) === false) {
-                throw new Exception('failed to upload request logs');
-            }
-        } catch (Exception $e) {
-            $this->pdo->exec("UPDATE requests SET sync_state = 'idle' WHERE sync_state = 'sending'");
-            throw $e;
-        }
-
-        $this->pdo->exec("UPDATE requests SET sync_state = 'sent' WHERE sync_state = 'sending'");
+        return $rows;
     }
 
     private function setLastExportDate()
