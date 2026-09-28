@@ -21,14 +21,14 @@ class FullCheckTest extends TestCase {
     private function getRequestsTestData(): array
     {
         return [
-            'request1' => RequestDto::fromArray(['id' => bin2hex(random_bytes(16)), 'fingerprint' => 'personal_whitelisted', 'ip' => '10.10.10.10', 'ua_name' => 'useragent1']),
-            'request2' => RequestDto::fromArray(['id' => bin2hex(random_bytes(16)), 'fingerprint' => 'personal_blacklisted', 'ip' => '10.10.10.11', 'ua_name' => 'useragent2']),
-            'request3' => RequestDto::fromArray(['id' => bin2hex(random_bytes(16)), 'fingerprint' => 'common_whitelisted',   'ip' => '10.10.10.12', 'ua_name' => 'useragent3']),
-            'request4' => RequestDto::fromArray(['id' => bin2hex(random_bytes(16)), 'fingerprint' => 'common_blacklisted',   'ip' => '10.10.10.13', 'ua_name' => 'useragent4']),
-            'request5' => RequestDto::fromArray(['id' => bin2hex(random_bytes(16)), 'fingerprint' => 'ua_whitelisted',       'ip' => '10.10.10.14', 'ua_name' => 'Applebot', 'ua_id' => 17]),
-            'request6' => RequestDto::fromArray(['id' => bin2hex(random_bytes(16)), 'fingerprint' => 'js_check_failed',      'ip' => '2001:db8::1', 'ua_name' => 'useragent6']),
-            'request7' => RequestDto::fromArray(['id' => bin2hex(random_bytes(16)), 'fingerprint' => 'js_check_passed',      'ip' => '2001:db8::2', 'ua_name' => 'useragent7']),
-            'request8' => RequestDto::fromArray(['id' => bin2hex(random_bytes(16)), 'fingerprint' => 'first_visit',          'ip' => '10.10.10.17', 'ua_name' => 'useragent8']),
+            'request1' => RequestDto::fromArray(['id' => bin2hex(random_bytes(16)), 'fingerprint' => 'personal_whitelisted', 'ip' => '10.10.10.10', 'ua_name' => 'useragent1', 'url' => '/']),
+            'request2' => RequestDto::fromArray(['id' => bin2hex(random_bytes(16)), 'fingerprint' => 'personal_blacklisted', 'ip' => '10.10.10.11', 'ua_name' => 'useragent2', 'url' => '/']),
+            'request3' => RequestDto::fromArray(['id' => bin2hex(random_bytes(16)), 'fingerprint' => 'common_whitelisted',   'ip' => '10.10.10.12', 'ua_name' => 'useragent3', 'url' => '/']),
+            'request4' => RequestDto::fromArray(['id' => bin2hex(random_bytes(16)), 'fingerprint' => 'common_blacklisted',   'ip' => '10.10.10.13', 'ua_name' => 'useragent4', 'url' => '/']),
+            'request5' => RequestDto::fromArray(['id' => bin2hex(random_bytes(16)), 'fingerprint' => 'ua_whitelisted',       'ip' => '10.10.10.14', 'ua_name' => 'Applebot', 'ua_id' => 17, 'url' => '/']),
+            'request6' => RequestDto::fromArray(['id' => bin2hex(random_bytes(16)), 'fingerprint' => 'js_check_failed',      'ip' => '2001:db8::1', 'ua_name' => 'useragent6', 'url' => '/']),
+            'request7' => RequestDto::fromArray(['id' => bin2hex(random_bytes(16)), 'fingerprint' => 'js_check_passed',      'ip' => '2001:db8::2', 'ua_name' => 'useragent7', 'url' => '/']),
+            'request8' => RequestDto::fromArray(['id' => bin2hex(random_bytes(16)), 'fingerprint' => 'first_visit',          'ip' => '10.10.10.17', 'ua_name' => 'useragent8', 'url' => '/']),
         ];
     }
 
