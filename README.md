@@ -1,6 +1,6 @@
 # Anti-Crawler PHP Library by CleanTalk
 
-PHP library to block unwanted crawlers, scrapers and bad bots by User-Agent, IP block lists and allow lists. No captcha, no challenge pages for real visitors - works on any PHP site and is powered by the CleanTalk bot database.
+Free tool to block unwanted crawlers, scrapers and bad bots by User-Agent, IP block lists and allow lists. No captcha, works on any PHP site. Free self hosted alternative to Cloudflare.
 
 **What it does**
 
@@ -191,6 +191,8 @@ The same list is maintained in the CleanTalk help center: https://cleantalk.org/
 - WPCompress
 - Yandex
 - YouBot
+
+Free standalone (cloud less), alternative to [CloudFlare BotManagement](https://www.cloudflare.com/products/bot-management/)
 
 **Related projects by CleanTalk**
 
