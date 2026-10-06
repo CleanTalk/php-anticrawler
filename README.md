@@ -9,6 +9,10 @@ Free tool to block unwanted crawlers, scrapers and bad bots on PHP sites without
 - Optionally checks every visitor against CleanTalk block lists and allow lists with your API key.
 - Optionally recognises 70+ known bots by User-Agent (see the list at the end) and lets you decide which of them to allow.
 
+  <img width="1019" height="354" alt="image" src="https://github.com/user-attachments/assets/2dc38928-671a-44a3-8fbf-8c42ea108222" />
+
+
+
 **Installation**
 
 `composer require cleantalk/php-anticrawler`
