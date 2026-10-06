@@ -41,6 +41,8 @@ Free tool to block unwanted crawlers, scrapers and bad bots on PHP sites without
 
 4) (Optional) Customize your block screen.
 By default, denied visitors receive `cleantalk-anticrawler.html`. To use your own screen, pass its full path, including the filename, as the second argument: `$ac->showAccessDeniedScreen(403, /path/to/my-block-screen.html')`. The first argument is the HTTP status (403 by default). The `:IP:` placeholder is replaced with the visitor's escaped IP address. Keep the `js_anticrawler_passed` cookie logic in your template so real visitors can pass the check.
+<img width="709" height="444" alt="image" src="https://github.com/user-attachments/assets/c28b1298-9899-4486-90b7-cd049cead0c1" />
+
 
 This sets you up with the basic library functionality.
 
