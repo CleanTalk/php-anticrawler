@@ -8,6 +8,7 @@ Free tool to block unwanted crawlers, scrapers and bad bots on PHP sites without
 - Stores visitor state in SQLite or KeyDB, so it runs on shared hosting as well as on a cluster.
 - Optionally checks every visitor against CleanTalk block lists and allow lists with your API key.
 - Optionally recognises 70+ known bots by User-Agent (see the list at the end) and lets you decide which of them to allow.
+- Lets you customize the block screen shown to denied visitors.
 
   <img width="1019" height="354" alt="image" src="https://github.com/user-attachments/assets/2dc38928-671a-44a3-8fbf-8c42ea108222" />
 
@@ -39,7 +40,7 @@ Free tool to block unwanted crawlers, scrapers and bad bots on PHP sites without
 ```
 
 4) (Optional) Customize your block screen.
-By default, crawlers receive the template defined in `cleantalk-anticrawler.html`. You can customize it as you like.
+By default, denied visitors receive `cleantalk-anticrawler.html`. To use your own screen, pass its full path, including the filename, as the second argument: `$ac->showAccessDeniedScreen(403, /path/to/my-block-screen.html')`. The first argument is the HTTP status (403 by default). The `:IP:` placeholder is replaced with the visitor's escaped IP address. Keep the `js_anticrawler_passed` cookie logic in your template so real visitors can pass the check.
 
 This sets you up with the basic library functionality.
 

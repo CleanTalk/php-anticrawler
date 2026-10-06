@@ -208,12 +208,12 @@ final class CleanTalkAntiCrawler
         return isset($_COOKIE[self::COOKIE]) && $_COOKIE[self::COOKIE] == 1;
     }
 
-    public function showAccessDeniedScreen(int $status = 403): void
+    public function showAccessDeniedScreen(int $status = 403, ?string $templatePath = null): void
     {
         http_response_code($status);
         header('content-type: text/html; charset=utf-8');
 
-        $html = file_get_contents(__DIR__ . '/cleantalk-anticrawler.html');
+        $html = file_get_contents($templatePath ?? __DIR__ . '/cleantalk-anticrawler.html');
         $html = str_replace(':IP:', htmlspecialchars(self::ip(), ENT_QUOTES, 'UTF-8'), $html);
 
         echo $html;
