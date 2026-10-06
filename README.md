@@ -10,7 +10,9 @@ Free tool to block unwanted crawlers, scrapers and bad bots on PHP sites without
 - Optionally recognises 70+ known bots by User-Agent (see the list at the end) and lets you decide which of them to allow.
 - Lets you customize the block screen shown to denied visitors.
 
+<p align="center">
   <img width="1019" height="354" alt="image" src="https://github.com/user-attachments/assets/2dc38928-671a-44a3-8fbf-8c42ea108222" />
+</p>
 
 
 
@@ -40,8 +42,11 @@ Free tool to block unwanted crawlers, scrapers and bad bots on PHP sites without
 ```
 
 4) (Optional) Customize your block screen.
-By default, denied visitors receive `cleantalk-anticrawler.html`. To use your own screen, pass its full path, including the filename, as the second argument: `$ac->showAccessDeniedScreen(403, /path/to/my-block-screen.html')`. The first argument is the HTTP status (403 by default). The `:IP:` placeholder is replaced with the visitor's escaped IP address. Keep the `js_anticrawler_passed` cookie logic in your template so real visitors can pass the check.
-<img width="709" height="444" alt="image" src="https://github.com/user-attachments/assets/c28b1298-9899-4486-90b7-cd049cead0c1" />
+By default, denied visitors receive `cleantalk-anticrawler.html`. To use your own screen, pass its full path, including the filename, as the second argument: `$ac->showAccessDeniedScreen(403, '/path/to/my-block-screen.html')`. The first argument is the HTTP status (403 by default). The `:IP:` placeholder is replaced with the visitor's escaped IP address. Keep the `js_anticrawler_passed` cookie logic in your template so real visitors can pass the check.
+
+<p align="center">
+  <img width="709" height="444" alt="image" src="https://github.com/user-attachments/assets/c28b1298-9899-4486-90b7-cd049cead0c1" />
+</p>
 
 
 This sets you up with the basic library functionality.
