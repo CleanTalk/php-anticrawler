@@ -1,13 +1,13 @@
 # Anti-Crawler PHP Library by CleanTalk
 
-Free tool to block unwanted crawlers, scrapers and bad bots by User-Agent, IP block lists and allow lists. No captcha, works on any PHP site. Free self hosted alternative to Cloudflare.
+Free tool to block unwanted crawlers, scrapers and bad bots on PHP sites without a captcha that works on its own. An active CleanTalk API key also enables CleanTalk's User-Agent and IP lists.
 
 **What it does**
 
 - Blocks scrapers, SEO crawlers and scanner bots before they reach your page logic.
-- Recognises 70+ known bots by User-Agent (see the list at the end) and lets you decide which of them to allow.
-- Optionally checks every visitor against CleanTalk block lists and allow lists with your API key.
 - Stores visitor state in SQLite or KeyDB, so it runs on shared hosting as well as on a cluster.
+- Optionally checks every visitor against CleanTalk block lists and allow lists with your API key.
+- Optionally recognises 70+ known bots by User-Agent (see the list at the end) and lets you decide which of them to allow.
 
 **Installation**
 
@@ -43,10 +43,10 @@ This sets you up with the basic library functionality.
 
 **Full capabilities**
 
-The library integrates with the CleanTalk database and can use its allow lists, block lists, and "good User-Agent" collection. To enable the integration, you need a CleanTalk API key for your website. Follow these steps:
+The library integrates with the CleanTalk database and can use its allow lists, block lists, and "good User-Agent" collection. To enable the integration, you need an active CleanTalk API key for your website. Follow these steps:
 1) If you do not have a CleanTalk account yet, register at https://cleantalk.org/register.
 2) Once your account is created, copy your API key from the CleanTalk site.
-3) Create a `Config.php` file from `Config.php.example` in the plugin directory. Fill the `API_KEY` value with your API key.
+3) Pass the key to the constructor: `new CleanTalkAntiCrawler(['api_key' => 'your_api_key'])`.
 4) Ensure that your CleanTalk Anti-Spam license is active (trial or paid).
 
 With these settings in place, the library will use CleanTalk lists and User-Agent data to make filtering more precise. You can also manage your personal allow/block lists in the website interface. Visitors' data will be sent to your CleanTalk account.
@@ -70,7 +70,7 @@ List of settings:
 | Setting | Type | Description |
 | --- | --- | --- |
 | db_path | string | System path to the SQLite database file |
-| api_key | string | CleanTalk API key (see "Full capabilities" section above) |
+| api_key | string | Optional CleanTalk API key; enables list and User-Agent checks when active (see "Full capabilities" above) |
 | min_sync_interval | int | Minimum time interval between synchronizations when using default sync behavior, in seconds |
 | max_sync_interval | int | Maximum time interval between synchronizations when using default sync behavior, in seconds |
 | visitor_forget_after | int | Time limit for storing visitor data in the library database, in seconds (decrease this if you have storage issues) |
@@ -106,7 +106,7 @@ SQLite is still used for `kv`, `lists`, and `user_agents` tables.
 
 **Why not a captcha**
 
-A captcha challenges every visitor, including the real ones, and modern bots solve it anyway. This library decides on the server side, before the page is rendered: a visitor with a known bot User-Agent, a blocked IP or crawler-like behaviour gets the access denied screen, and everyone else sees the page as usual. Nothing is shown to real people, nothing has to be clicked.
+A captcha challenges every visitor, including the real ones, and modern bots solve it anyway. This library decides on the server side, before the page is rendered. Without an API key, it checks for the JavaScript cookie on repeat visits. With an active key, it also checks CleanTalk's IP lists and User-Agent rules. Visitors are not asked to solve a challenge.
 
 **How it compares**
 
@@ -117,7 +117,7 @@ A captcha challenges every visitor, including the real ones, and modern bots sol
 | Captcha on every page | Partly | Yes, everyone clicks | Yes |
 | **This library** | Yes | No | Yes, with CleanTalk lists updated from the cloud |
 
-**List of supported User-Agents (bots)**
+**List of supported User-Agents (with an active API key)**
 
 The same list is maintained in the CleanTalk help center: https://cleantalk.org/help/filter-ua
 
@@ -192,7 +192,7 @@ The same list is maintained in the CleanTalk help center: https://cleantalk.org/
 - Yandex
 - YouBot
 
-Free standalone (cloud less), alternative to [CloudFlare BotManagement](https://www.cloudflare.com/products/bot-management/)
+The keyless cookie check runs without the CleanTalk cloud. For list and User-Agent checks, use an active API key.
 
 **Related projects by CleanTalk**
 
