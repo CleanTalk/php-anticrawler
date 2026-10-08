@@ -16,6 +16,10 @@ Free tool to block unwanted crawlers, scrapers and bad bots on PHP sites without
 
 
 
+**Block AI crawlers**
+
+The User-Agent database already includes the major AI crawlers, so the library blocks them out of the box: GPTBot and OAI-SearchBot (OpenAI), ClaudeBot (Anthropic), PerplexityBot, Google-Extended, Applebot-Extended, meta-externalagent (Meta), Amazonbot and others. Unlike `robots.txt`, which a crawler may ignore, the check happens on the server before your page logic runs. If you want to keep some of them (for example Google-Extended for AI Overviews), add them to your allow list. The full, regularly updated list is at https://cleantalk.org/help/filter-ua.
+
 **Installation**
 
 `composer require cleantalk/php-anticrawler`
